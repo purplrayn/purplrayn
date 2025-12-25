@@ -1,1823 +1,579 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.A.P. Secure Access Portal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>@purplrayn</title>
+    
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --shield-blue: #0d3b5a;
-            --shield-light: #1d7abf;
-            --tva-brown: #3d2b1f;
-            --tva-gold: #f0d9a8;
-            --dark-bg: #0a0a12;
-            --darker-bg: #050509;
-            --text-light: #e0f2ff;
-            --warning-red: #ff5555;
-            --glow-blue: rgba(0, 170, 255, 0.7);
-            --glow-gold: rgba(240, 217, 168, 0.7);
-            --login-blue: #1a5a8a;
-            --login-gold: #b08d57;
+            --accent: #b501e6;
+            --bg: #050505;
+            --card-bg: rgba(10, 10, 10, 0.6);
+            --text: #ffffff;
+            --text-dim: #a1a1a1;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+
+        body, a, .social-link, .widget-box, .card-container {
+            cursor: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="0" x2="10" y2="20" stroke="%23b501e6" stroke-width="2.5" stroke-linecap="round"/><line x1="0" y1="10" x2="20" y2="10" stroke="%23b501e6" stroke-width="2.5" stroke-linecap="round"/><circle cx="10" cy="10" r="1.5" fill="white"/></svg>') 10 10, auto;
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
-            font-family: 'Montserrat', sans-serif;
-            color: var(--text-light);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh; 
+            overflow-y: auto; 
             overflow-x: hidden;
+            display: flex; justify-content: center; align-items: center;
+            user-select: none;
+        }
+
+        #starfield {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            filter: blur(1px); 
+        }
+        .vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 30%, #000 100%);
+            pointer-events: none; z-index: -1;
+        }
+
+        #loader-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .loader-wrapper {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            width: 180px; height: 180px; font-family: "Inter", sans-serif; font-size: 1.2em; font-weight: 300;
+            color: white; border-radius: 50%; background-color: transparent; user-select: none;
+        }
+        .loader {
+            position: absolute; top: 0; left: 0; width: 100%; aspect-ratio: 1 / 1;
+            border-radius: 50%; background-color: transparent;
+            animation: loader-rotate 2s linear infinite; z-index: 0;
+        }
+        @keyframes loader-rotate {
+            0% { transform: rotate(90deg); box-shadow: 0 10px 20px 0 #fff inset, 0 20px 30px 0 #b501e6 inset, 0 60px 60px 0 #5e1585 inset; }
+            50% { transform: rotate(270deg); box-shadow: 0 10px 20px 0 #fff inset, 0 20px 10px 0 #d60a87 inset, 0 40px 60px 0 #311e80 inset; }
+            100% { transform: rotate(450deg); box-shadow: 0 10px 20px 0 #fff inset, 0 20px 30px 0 #b501e6 inset, 0 60px 60px 0 #5e1585 inset; }
+        }
+        .loader-letter {
+            display: inline-block; opacity: 0.4; transform: translateY(0);
+            animation: loader-letter-anim 2s infinite; z-index: 1; border-radius: 50ch; border: none; font-weight: 600; letter-spacing: 2px; text-shadow: 0 0 5px var(--accent);
+        }
+        .loader-letter:nth-child(1) { animation-delay: 0s; } .loader-letter:nth-child(2) { animation-delay: 0.1s; } .loader-letter:nth-child(3) { animation-delay: 0.2s; }
+        .loader-letter:nth-child(4) { animation-delay: 0.3s; } .loader-letter:nth-child(5) { animation-delay: 0.4s; } .loader-letter:nth-child(6) { animation-delay: 0.5s; }
+        .loader-letter:nth-child(7) { animation-delay: 0.6s; } .loader-letter:nth-child(8) { animation-delay: 0.7s; } .loader-letter:nth-child(9) { animation-delay: 0.8s; }
+        @keyframes loader-letter-anim {
+            0%, 100% { opacity: 0.4; transform: translateY(0); } 20% { opacity: 1; transform: scale(1.15); text-shadow: 0 0 15px #fff; } 40% { opacity: 0.7; transform: translateY(0); }
+        }
+        body.loaded #loader-container { opacity: 0; visibility: hidden; }
+
+        .card {
+            width: 420px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(181, 1, 230, 0.2); border-radius: 12px;
+            padding: 30px 20px 30px 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transform: scale(0.9);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
             position: relative;
+            overflow: visible;
         }
         
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(29, 122, 191, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(240, 217, 168, 0.05) 0%, transparent 40%),
-                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2311111d' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E");
-            background-attachment: fixed;
-            opacity: 0.8;
-            z-index: -1;
+        body.entered .card { opacity: 1; transform: scale(1); }
+
+        .stats-row {
+            width: 100%; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; padding: 0 10px;
+            font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.85rem; color: var(--text-dim);
+        }
+        .stat-item { display: flex; align-items: center; gap: 6px; }
+        .stat-item i { color: var(--accent); }
+
+        .avatar-container { position: relative; width: 130px; height: 130px; margin-bottom: 20px; }
+        .avatar {
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+            animation: coinFlip 6s infinite ease-in-out, neonFlicker 3s infinite;
+            border: 2px solid rgba(181, 1, 230, 0.8);
+        }
+        .badge-wrapper {
+            position: absolute; bottom: 0px; right: 0px; width: 32px; height: 32px;
+            display: flex; justify-content: center; align-items: center; z-index: 5; transition: transform 0.2s;
+        }
+        .badge-bg {
+            position: absolute; width: 100%; height: 100%; background-color: #000;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+        }
+        .badge-bg::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--accent); z-index: -1; }
+        .badge-bg-inner {
+            position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; background: #000;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+            animation: neonFlicker 2s infinite; 
+        }
+        .badge-icon { font-size: 0.9rem; color: var(--accent); z-index: 2; text-shadow: 0 0 5px var(--accent); }
+        .badge-wrapper:hover { transform: scale(1.1); }
+        .badge-wrapper::after {
+            content: "Certified"; position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.9); border: 1px solid var(--accent); color: #fff;
+            padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .badge-wrapper:hover::after { opacity: 1; }
+
+        @keyframes neonFlicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { box-shadow: inset 0 0 10px var(--accent); opacity: 1; }
+            20%, 24%, 55% { box-shadow: none; opacity: 0.6; }
+        }
+        @keyframes coinFlip {
+            0% { transform: rotateY(0deg); } 20% { transform: rotateY(180deg); } 40% { transform: rotateY(360deg); } 100% { transform: rotateY(360deg); }
+        }
+
+        .username {
+            font-family: 'Rajdhani', sans-serif; font-size: 2.5rem; font-weight: 700; color: #fff;
+            margin-bottom: 5px; position: relative; display: inline-block; text-align: center;
+            text-shadow: 0 0 10px var(--accent);
+            animation: glitch-skew 3s infinite linear alternate-reverse;
+            min-height: 3.5rem;
+        }
+        .username::before, .username::after {
+            content: '@purplrayn'; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 10, 0.6);
+        }
+        .username::before {
+            left: 2px; text-shadow: -1px 0 #ff00c1; clip-path: inset(0 0 0 0);
+            animation: glitch-anim-1 5s infinite linear alternate-reverse;
+        }
+        .username::after {
+            left: -2px; text-shadow: -1px 0 #00fff9; clip-path: inset(0 0 0 0);
+            animation: glitch-anim-2 5s infinite linear alternate-reverse;
+        }
+        .username.copied-state { animation: none; color: #23a559; text-shadow: 0 0 15px #23a559; }
+        .username.copied-state::before, .username.copied-state::after { content: none; }
+        @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); } 100% { clip-path: inset(30% 0 30% 0); } }
+        @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); } 100% { clip-path: inset(5% 0 80% 0); } }
+        @keyframes glitch-skew { 0% { transform: skew(0deg); } 100% { transform: skew(0deg); } }
+
+        .badges {
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.05);
+            padding: 6px 12px; border-radius: 4px; margin-bottom: 30px; white-space: nowrap;
+        }
+        .badges i { font-size: 0.6rem; transition: color 0.3s; }
+        .badges span { font-size: 0.8rem; color: var(--text-dim); font-family: 'Inter', sans-serif; }
+
+        .socials { 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+            max-width: 360px;
+        }
+        .social-link {
+            font-size: 1.5rem; color: #e0e0e0; position: relative; text-decoration: none; 
+            transition: all 0.2s ease;
+            width: 40px; height: 40px;
+            display: flex; justify-content: center; align-items: center;
         }
         
-        .page {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--darker-bg);
+        .social-link:hover { 
+            color: #fff; text-shadow: 0 0 5px var(--accent), 0 0 8px var(--accent); transform: translateY(-3px);
             z-index: 100;
-            padding: 2rem;
-            overflow-y: auto;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.7s ease;
         }
         
-        .page.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
+        .social-link.active-click {
+            transform: scale(0.9);
+            color: rgba(255, 255, 255, 0.7);
+            text-shadow: 0 0 2px var(--accent);
         }
-        
-        .navbar {
+
+        .social-link::after {
+            content: attr(data-tooltip); position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.9); border: 1px solid var(--accent); color: #fff;
+            padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: 'Inter', sans-serif; 
+            z-index: 9999;
+        }
+        .social-link:hover::after { opacity: 1; }
+
+        .card-container {
+            margin-top: 20px;
+            width: 100%;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 3rem;
-            background: rgba(10, 10, 18, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 200;
-        }
-        
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 1.8rem;
-            letter-spacing: 3px;
-            color: var(--text-light);
-            text-shadow: 0 0 15px var(--glow-blue);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .logo .abbr {
-            font-size: 1rem;
-            background: rgba(29, 122, 191, 0.3);
-            padding: 2px 8px;
-            border-radius: 4px;
-            align-self: flex-start;
-            margin-bottom: 5px;
-        }
-        
-        .logo i {
-            color: var(--glow-blue);
-            animation: pulse 2s infinite;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--shield-blue) 0%, var(--shield-light) 100%);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-weight: bold;
-            border: 2px solid var(--glow-blue);
-            cursor: pointer;
-            transition: all 0.3s;
         }
-        
-        .user-avatar:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px var(--glow-blue);
-        }
-        
-        .profile-dropdown {
-            position: absolute;
-            top: 50px;
-            right: 0;
-            background: rgba(20, 25, 35, 0.95);
-            border: 1px solid var(--shield-light);
-            border-radius: 10px;
-            padding: 1.5rem;
-            width: 300px;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
+
+        .card-container img {
+            border-radius: 8px; 
+            border: 1px solid rgba(181, 1, 230, 0.4);
+            box-shadow: 0 0 15px rgba(181, 1, 230, 0.2);
             transition: all 0.3s ease;
+            max-width: 100%; 
+            height: auto;
+        }
+
+        .card-container a:hover img {
+            box-shadow: 0 0 25px var(--accent), 0 0 5px #fff inset;
+            border-color: var(--accent);
+            transform: scale(1.02) translateY(-2px);
+        }
+
+        .icon-impulse {
+            position: fixed; border-radius: 50%;
+            border: 3px solid rgba(181, 1, 230, 0.8);
+            box-shadow: 0 0 40px var(--accent), inset 0 0 40px var(--accent);
+            pointer-events: none; z-index: 10000; transform: translate(-50%, -50%);
+            animation: expandImpulse 0.5s ease-out forwards;
+        }
+        @keyframes expandImpulse {
+            0% { width: 0px; height: 0px; opacity: 1; border-width: 5px; }
+            100% { width: 500px; height: 500px; opacity: 0; border-width: 0px; }
+        }
+
+        .cursor-particle {
+            position: fixed; width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+            pointer-events: none; z-index: 9998; box-shadow: 0 0 10px var(--accent);
+            animation: particleDrop 0.8s linear forwards;
+        }
+        @keyframes particleDrop {
+            0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(40px) scale(0.2); }
+        }
+        .click-warp {
+             position: fixed; border-radius: 50%; border: 2px solid var(--accent);
+             box-shadow: 0 0 20px var(--accent), inset 0 0 20px var(--accent);
+             pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+             animation: expandWarp 0.5s ease-out forwards;
+        }
+        @keyframes expandWarp {
+            0% { width: 0px; height: 0px; opacity: 1; } 100% { width: 150px; height: 150px; opacity: 0; border-width: 0px; }
         }
-        
-        .profile-dropdown.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .profile-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--shield-blue) 0%, var(--shield-light) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            border: 2px solid var(--glow-blue);
-        }
-        
-        .profile-details h3 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
-        
-        .profile-details p {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-        
-        .profile-info {
-            margin-bottom: 1.5rem;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-        
-        .info-label {
-            color: var(--shield-light);
-            font-weight: 600;
-        }
-        
-        .info-value {
-            text-align: right;
-        }
-        
-        .logout-btn {
-            width: 100%;
-            padding: 10px;
-            background: linear-gradient(135deg, #8b0000 0%, #ff0000 100%);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .logout-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
-        }
-        
-        .security-level {
-            font-size: 0.9rem;
-            color: #aaa;
-            letter-spacing: 1px;
-        }
-        
-        .header {
-            text-align: center;
-            padding: 4rem 2rem 3rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .header h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.8rem;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(to right, var(--text-light), var(--shield-light));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
-        }
-        
-        .header p {
-            font-size: 1.2rem;
-            line-height: 1.7;
-            color: #b0c4de;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .container {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            flex-wrap: wrap;
-        }
-        
-        .access-card {
-            width: 500px;
-            height: 350px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            background: rgba(20, 20, 30, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 0.8s forwards;
-        }
-        
-        .access-card:nth-child(1) {
-            animation-delay: 0.2s;
-        }
-        
-        .access-card:nth-child(2) {
-            animation-delay: 0.4s;
-        }
-        
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .access-card:hover {
-            transform: translateY(-15px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-        }
-        
-        .shield-card {
-            background: linear-gradient(135deg, rgba(13, 59, 90, 0.3) 0%, rgba(29, 122, 191, 0.2) 100%);
-        }
-        
-        .shield-card:hover {
-            box-shadow: 0 20px 40px rgba(29, 122, 191, 0.4);
-        }
-        
-        .tva-card {
-            background: linear-gradient(135deg, rgba(61, 43, 31, 0.3) 0%, rgba(240, 217, 168, 0.2) 100%);
-        }
-        
-        .tva-card:hover {
-            box-shadow: 0 20px 40px rgba(240, 217, 168, 0.3);
-        }
-        
-        .card-content {
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .card-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        
-        .shield-card .card-icon {
-            color: var(--shield-light);
-            text-shadow: 0 0 20px var(--glow-blue);
-        }
-        
-        .tva-card .card-icon {
-            color: var(--tva-gold);
-            text-shadow: 0 0 20px rgba(240, 217, 168, 0.5);
-        }
-        
-        .access-level {
-            font-size: 1rem;
-            letter-spacing: 3px;
-            padding: 8px 20px;
-            border-radius: 20px;
-            margin-top: 1rem;
-            font-weight: 600;
-        }
-        
-        .shield-card .access-level {
-            background: rgba(29, 122, 191, 0.2);
-            color: var(--shield-light);
-            border: 1px solid var(--shield-light);
-        }
-        
-        .tva-card .access-level {
-            background: rgba(240, 217, 168, 0.1);
-            color: var(--tva-gold);
-            border: 1px solid var(--tva-gold);
-        }
-        
-        .classified-banner {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: linear-gradient(90deg, 
-                rgba(255, 0, 0, 0) 0%, 
-                rgba(255, 0, 0, 0.8) 10%, 
-                rgba(255, 0, 0, 0.8) 90%, 
-                rgba(255, 0, 0, 0) 100%);
-            color: white;
-            text-align: center;
-            padding: 15px;
-            font-size: 0.9rem;
-            letter-spacing: 3px;
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            transition: transform 0.5s ease-out;
-            z-index: 300;
-        }
-        
-        .close-banner {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 1.2rem;
-            background: rgba(0, 0, 0, 0.3);
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            animation: float 15s infinite linear;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-        
-        @keyframes float {
-            0% { 
-                transform: translateY(0) translateX(0); 
-                opacity: 0;
-            }
-            10% { opacity: 0.1; }
-            50% { opacity: 0.3; }
-            90% { opacity: 0; }
-            100% { 
-                transform: translateY(-100vh) translateX(100px); 
-                opacity: 0;
-            }
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 1100px) {
-            .container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .access-card {
-                width: 90%;
-                max-width: 500px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-                letter-spacing: 4px;
-            }
-            
-            .header p {
-                font-size: 1rem;
-            }
-            
-            .access-card {
-                height: 300px;
-                font-size: 1.5rem;
-            }
-            
-            .navbar {
-                padding: 1rem;
-            }
-            
-            .logo {
-                font-size: 1.4rem;
-            }
-        }
-        
-        /* Shield Animation */
-        .shield-animation {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
-        
-        .shield-animation .pulse {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 2px solid var(--shield-light);
-            box-shadow: 0 0 20px var(--glow-blue);
-            animation: shieldPulse 3s infinite;
-        }
-        
-        .shield-animation .pulse:nth-child(1) {
-            animation-delay: 0s;
-        }
-        
-        .shield-animation .pulse:nth-child(2) {
-            animation-delay: 1s;
-        }
-        
-        .shield-animation .pulse:nth-child(3) {
-            animation-delay: 2s;
-        }
-        
-        @keyframes shieldPulse {
-            0% {
-                width: 100px;
-                height: 100px;
-                opacity: 1;
-            }
-            100% {
-                width: 300px;
-                height: 300px;
-                opacity: 0;
-            }
-        }
-        
-        /* TVA Animation */
-        .tva-animation {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            overflow: hidden;
-        }
-        
-        .tva-animation .timeline {
-            position: absolute;
-            height: 100%;
-            width: 3px;
-            background: linear-gradient(to bottom, transparent, var(--tva-gold), transparent);
-            left: 50%;
-            transform: translateX(-50%);
-            animation: timelinePulse 4s infinite;
-        }
-        
-        .tva-animation .time-node {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: var(--tva-gold);
-            border-radius: 50%;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: timeNodeMove 10s infinite linear;
-        }
-        
-        @keyframes timelinePulse {
-            0% { opacity: 0.3; }
-            50% { opacity: 1; }
-            100% { opacity: 0.3; }
-        }
-        
-        @keyframes timeNodeMove {
-            0% { top: 0; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-        
-        /* Login Form Styling */
-        .login-form {
-            max-width: 500px;
-            width: 100%;
-            padding: 2rem;
-            background: rgba(30, 30, 40, 0.7);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 2rem auto;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s forwards;
-            animation-delay: 0.2s;
-        }
-        
-        .form-title {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #aaa;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(10, 10, 20, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            color: var(--text-light);
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--glow-blue);
-        }
-        
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, var(--login-blue) 0%, var(--shield-light) 100%);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Dossier Styling */
-        .dossier-content {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: rgba(10, 10, 20, 0.7);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-family: 'Courier New', monospace;
-            line-height: 1.8;
-            position: relative;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s forwards;
-        }
-        
-        .shield-page .dossier-content {
-            border-left: 5px solid var(--shield-light);
-            box-shadow: 0 0 30px rgba(29, 122, 191, 0.3);
-        }
-        
-        .tva-page .dossier-content {
-            border-left: 5px solid var(--tva-gold);
-            box-shadow: 0 0 30px rgba(240, 217, 168, 0.2);
-        }
-        
-        .dossier-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--shield-light);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 1.8rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .dossier-section {
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-        
-        .dossier-section-title {
-            color: var(--tva-gold);
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-        
-        .censored {
-            background-color: black;
-            color: black;
-            padding: 0 5px;
-        }
-        
-        /* Console Styling */
-        .console-container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: rgba(10, 10, 20, 0.7);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 30px rgba(29, 122, 191, 0.3);
-            font-family: 'Courier New', monospace;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s forwards;
-        }
-        
-        .console-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--shield-light);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 1.8rem;
-        }
-        
-        .console-subheader {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #aaa;
-            font-size: 1.1rem;
-        }
-        
-        .files-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        
-        .file-card {
-            background: rgba(20, 20, 30, 0.5);
-            border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        
-        .file-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            border-color: var(--glow-blue);
-        }
-        
-        .file-card.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .file-card.locked::after {
-            content: "LOCKED";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--warning-red);
-            font-size: 1.2rem;
-        }
-        
-        .file-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--shield-light);
-        }
-        
-        .file-title {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-light);
-        }
-        
-        .file-subject {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-        
-        /* Back button styling */
-        .back-button {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: var(--text-light);
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .back-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
-        }
-        
-        /* Typewriter effect */
-        .dossier-line {
-            margin-bottom: 1rem;
-            display: block;
-            opacity: 0;
-            overflow: hidden;
-            white-space: nowrap;
-            animation: typewriter 4s steps(40, end) forwards;
-            animation-delay: calc(var(--delay) * 0.5s);
-            width: 0;
-        }
-        
-        @keyframes typewriter {
-            to { 
-                width: 100%; 
-                opacity: 1;
-            }
-        }
-        
-        /* Error message */
-        .error-message {
-            display: none;
-            background: rgba(200, 0, 0, 0.7);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-top: 2rem;
-            text-align: center;
-            animation: blink 1s infinite;
-        }
-        
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        
-        .countdown {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 1rem 0;
-            font-family: 'Orbitron', sans-serif;
-        }
-        
-        /* Location Tracking Overlay */
-        .location-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: var(--warning-red);
-            font-family: 'Orbitron', sans-serif;
-            text-align: center;
-        }
-        
-        .location-map {
-            width: 80%;
-            max-width: 600px;
-            height: 400px;
-            background: linear-gradient(135deg, #1a2a3a 0%, #0a1a2a 100%);
-            border: 2px solid var(--warning-red);
-            border-radius: 10px;
-            margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .map-grid {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(to right, rgba(255,0,0,0.1) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,0,0,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        
-        .map-marker {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--warning-red);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 20px var(--warning-red);
-            animation: pulse 1s infinite;
-        }
-        
-        .location-info {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-        
-        .info-box {
-            background: rgba(200, 0, 0, 0.2);
-            padding: 1rem 2rem;
-            border-radius: 5px;
-            border: 1px solid var(--warning-red);
-        }
-        
-        .info-title {
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-            color: #ff9999;
-        }
-        
-        .info-data {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        
-        /* Audio Controls */
-        .audio-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        
     </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
-    
-    <div class="classified-banner" id="warningBanner">
-        WARNING: UNAUTHORIZED ACCESS WILL BE PUNISHED BY TEMPORAL ERASURE OR INCARCERATION
-        <div class="close-banner" id="closeBanner">
-            <i class="fas fa-times"></i>
+
+    <canvas id="starfield"></canvas>
+    <div class="vignette"></div>
+
+    <div id="loader-container">
+        <div class="loader-wrapper">
+            <span class="loader-letter">p</span><span class="loader-letter">u</span><span class="loader-letter">r</span><span class="loader-letter">p</span><span class="loader-letter">l</span><span class="loader-letter">r</span><span class="loader-letter">a</span><span class="loader-letter">y</span><span class="loader-letter">n</span>
+            <div class="loader"></div>
         </div>
     </div>
-    
-    <div class="location-overlay" id="locationOverlay">
-        <h2>SECURITY BREACH DETECTED!</h2>
-        <p>YOUR LOCATION HAS BEEN IDENTIFIED. A TEMPORAL STRIKE TEAM HAS BEEN DISPATCHED.</p>
-        
-        <div class="location-map">
-            <div class="map-grid"></div>
-            <div class="map-marker"></div>
-        </div>
-        
-        <div class="location-info">
-            <div class="info-box">
-                <div class="info-title">COORDINATES</div>
-                <div class="info-data" id="coordinates">39.8283° N, 98.5795° W</div>
+
+    <div class="card">
+        <div class="stats-row">
+            <div class="stat-item" id="views-stat">
+                <i class="fa-solid fa-eye"></i>
+                <span id="view-count">...</span>
             </div>
-            <div class="info-box">
-                <div class="info-title">IP ADDRESS</div>
-                <div class="info-data" id="ipAddress">192.168.72.204</div>
-            </div>
-            <div class="info-box">
-                <div class="info-title">TIME TO ARRIVAL</div>
-                <div class="info-data" id="arrivalTime">00:00:30</div>
+            <div class="stat-item" id="clock-stat">
+                <i class="fa-regular fa-clock"></i>
+                <span id="clock-time">...</span>
             </div>
         </div>
+
+        <div class="avatar-container">
+            <img src="purplrayn_charakter_design_by_chatgpt.jpg" alt="Avatar" class="avatar">
+            <div class="badge-wrapper">
+                <div class="badge-bg"></div><div class="badge-bg-inner"></div><i class="fa-solid fa-check badge-icon"></i>
+            </div>
+        </div>
+
+        <div class="username" id="username-display">@purplrayn</div>
+        
+        <div class="badges" id="status-badge">
+            <i class="fa-solid fa-circle" id="status-dot" style="color: #747f8d;"></i>
+            <span id="status-text">Loading...</span>
+        </div>
+
+        <div class="socials">
+            
+            <a href="https://steamcommunity.com/id/purplrayn/" target="_blank" class="social-link" 
+               data-tooltip="Visit Profile" onclick="handleIconClick(event, 'link')">
+                <i class="fa-brands fa-steam"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for Discord" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn'); return false;">
+                <i class="fa-brands fa-discord"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for PSN" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn'); return false;">
+                <i class="fa-brands fa-playstation"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for Xbox/Microsoft" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn'); return false;">
+                <i class="fa-brands fa-xbox"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for battle.net" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn#2487'); return false;">
+                <i class="fa-brands fa-battle-net"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for Riot Games" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn#7777'); return false;">
+                <i class="fa-solid fa-hand-fist"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for Bungie.net" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn'); return false;">
+                <i class="fa-solid fa-ghost"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for Epic Games" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn'); return false;">
+                <i class="fa-solid fa-bolt"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for LoL" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn'); return false;">
+                <i class="fa-solid fa-gamepad"></i>
+            </a>
+
+            <a href="#" class="social-link" data-tooltip="Copy username for RuneScape/Old School RuneScape" 
+               onclick="handleIconClick(event, 'copy', 'purplrayn'); return false;">
+                <i class="fa-solid fa-scroll"></i>
+            </a>
+
+        </div>
+
+        <div class="card-container">
+            <a href="https://psnprofiles.com/purplrayn" target="_blank">
+                <img src="https://card.psnprofiles.com/2/purplrayn.png" border="0" alt="PSN Profile">
+            </a>
+        </div>
+
+        <div class="card-container">
+            <a href="https://steamcommunity.com/id/purplrayn/" target="_blank">
+                <img src="https://my-steam.suzuki3.jp/api/card?id=76561198030879942&lang=en&size=medium" alt="MySteam Profile">
+            </a>
+        </div>
+
     </div>
-    
-    <!-- Login Page -->
-    <div class="page active" id="loginPage">
-        <div class="navbar">
-            <div class="logo-container">
-                <div class="logo">
-                    <span class="abbr">S.A.P.</span>
-                    SECURE ACCESS PORTAL
-                </div>
-            </div>
-            <div class="user-info">
-                <div class="security-level">CLEARANCE LEVEL 0</div>
-                <div class="user-avatar">?</div>
-            </div>
-        </div>
-        
-        <div class="header">
-            <h1>CLASSIFIED INFORMATION SYSTEM</h1>
-            <p>Access to top secret information from S.H.I.E.L.D. and the Time Variance Authority. Authorized personnel only.</p>
-        </div>
-        
-        <div class="login-form">
-            <div class="form-title">SYSTEM ACCESS VERIFICATION</div>
-            <div class="input-group">
-                <label for="systemUsername">AGENT ID</label>
-                <input type="text" id="systemUsername" placeholder="Enter agent ID">
-            </div>
-            <div class="input-group">
-                <label for="systemPassword">SECURITY CODE</label>
-                <input type="password" id="systemPassword" placeholder="Enter security code">
-            </div>
-            <button class="submit-btn" id="systemLoginBtn">AUTHENTICATE</button>
-        </div>
-        
-        <div class="error-message" id="systemError">
-            SECURITY BREACH DETECTED!
-            <div class="countdown" id="systemCountdown">30</div>
-            SELF-DESTRUCT SEQUENCE INITIATED
-        </div>
-    </div>
-    
-    <!-- Console Page -->
-    <div class="page" id="consolePage">
-        <div class="navbar">
-            <button class="back-button" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-            <div class="logo-container">
-                <div class="logo">
-                    <span class="abbr">S.A.P.</span>
-                    SECURE ACCESS PORTAL
-                </div>
-            </div>
-            <div class="user-info">
-                <div class="security-level">CLEARANCE LEVEL 10</div>
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="profile-header">
-                        <div class="profile-icon">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div class="profile-details">
-                            <h3 id="profileName">AGENT</h3>
-                            <p id="profileTeam">TVA Temporal Division</p>
-                        </div>
-                    </div>
-                    <div class="profile-info">
-                        <div class="info-item">
-                            <span class="info-label">CLEARANCE:</span>
-                            <span class="info-value" id="profileClearance">ALPHA-OMEGA</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">TEAM:</span>
-                            <span class="info-value" id="profileTeamName">Time Variance Authority</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">INSTANCE:</span>
-                            <span class="info-value" id="profileInstance">Earth-616</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">LOCATION:</span>
-                            <span class="info-value" id="profileLocation">TVA Headquarters</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">DATE:</span>
-                            <span class="info-value" id="profileDate">31.07.3025</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">TIME:</span>
-                            <span class="info-value" id="profileTime">23:59:47</span>
-                        </div>
-                    </div>
-                    <button class="logout-btn" id="dropdownLogout">
-                        <i class="fas fa-power-off"></i> LOGOUT
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="console-container">
-            <div class="console-header">CLASSIFIED FILES CONSOLE</div>
-            <div class="console-subheader">Select a file to access classified information</div>
-            
-            <div class="files-container" id="filesContainer">
-                <div class="file-card" id="purplraynFile">
-                    <i class="fas fa-file-alt file-icon"></i>
-                    <div class="file-title">PURPLRAYN</div>
-                    <div class="file-subject">Dr. Rhaeyn Cerin</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">THANOS</div>
-                    <div class="file-subject">The Mad Titan</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">THE CREATOR</div>
-                    <div class="file-subject">Project Origin</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">PLANET DOOM</div>
-                    <div class="file-subject">Latveria Threat</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">IRON MAN</div>
-                    <div class="file-subject">Tony Stark</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">THOR</div>
-                    <div class="file-subject">God of Thunder</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">HELA</div>
-                    <div class="file-subject">Goddess of Death</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">RED SKULL</div>
-                    <div class="file-subject">Johann Schmidt</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">LOKI</div>
-                    <div class="file-subject">God of Mischief</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">INFINITY STONES</div>
-                    <div class="file-subject">All 6 Stones</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">ULTRON</div>
-                    <div class="file-subject">AI Threat</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">SURTUR</div>
-                    <div class="file-subject">Ragnarok</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">THE WATCHERS</div>
-                    <div class="file-subject">Multiverse Observers</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">ETERNALS</div>
-                    <div class="file-subject">Celestial Beings</div>
-                </div>
-                
-                <div class="file-card locked">
-                    <i class="fas fa-lock file-icon"></i>
-                    <div class="file-title">GALACTUS</div>
-                    <div class="file-subject">World Devourer</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Main Page (After file selection) -->
-    <div class="page" id="mainPage">
-        <div class="navbar">
-            <button class="back-button" id="backToConsole">
-                <i class="fas fa-arrow-left"></i> Back to Console
-            </button>
-            <div class="logo-container">
-                <div class="logo">
-                    <span class="abbr">S.A.P.</span>
-                    SECURE ACCESS PORTAL
-                </div>
-            </div>
-            <div class="user-info">
-                <div class="security-level">CLEARANCE LEVEL 10</div>
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="profile-header">
-                        <div class="profile-icon">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div class="profile-details">
-                            <h3 id="profileName">AGENT</h3>
-                            <p id="profileTeam">TVA Temporal Division</p>
-                        </div>
-                    </div>
-                    <div class="profile-info">
-                        <div class="info-item">
-                            <span class="info-label">CLEARANCE:</span>
-                            <span class="info-value" id="profileClearance">ALPHA-OMEGA</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">TEAM:</span>
-                            <span class="info-value" id="profileTeamName">Time Variance Authority</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">INSTANCE:</span>
-                            <span class="info-value" id="profileInstance">Earth-616</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">LOCATION:</span>
-                            <span class="info-value" id="profileLocation">TVA Headquarters</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">DATE:</span>
-                            <span class="info-value" id="profileDate">31.07.3025</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">TIME:</span>
-                            <span class="info-value" id="profileTime">23:59:47</span>
-                        </div>
-                    </div>
-                    <button class="logout-btn" id="dropdownLogout">
-                        <i class="fas fa-power-off"></i> LOGOUT
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="header">
-            <h1>CLASSIFIED INFORMATION SYSTEM</h1>
-            <p>Access to top secret information from S.H.I.E.L.D. and the Time Variance Authority. Select an agency.</p>
-        </div>
-        
-        <div class="container">
-            <div class="access-card shield-card" id="shieldCard">
-                <div class="shield-animation" id="shieldAnimation"></div>
-                <div class="card-content">
-                    <i class="fas fa-shield-alt card-icon"></i>
-                    <div>S.H.I.E.L.D.<br>CONFIDENTIAL INFORMATION</div>
-                    <div class="access-level">LEVEL ALPHA-RED CLEARANCE REQUIRED</div>
-                </div>
-            </div>
-            
-            <div class="access-card tva-card" id="tvaCard">
-                <div class="tva-animation" id="tvaAnimation"></div>
-                <div class="card-content">
-                    <i class="fas fa-hourglass-half card-icon"></i>
-                    <div>TVA<br>CONFIDENTIAL INFORMATION</div>
-                    <div class="access-level">TIME VARIANCE AUTHORIZATION</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- S.H.I.E.L.D. Page -->
-    <div class="page shield-page" id="shieldPage">
-        <div class="navbar">
-            <button class="back-button" id="backFromShield">
-                <i class="fas fa-arrow-left"></i> Back
-            </button>
-            <h2 class="logo">S.H.I.E.L.D. CLASSIFIED DOSSIER</h2>
-            <div class="user-info">
-                <div class="security-level">CLEARANCE LEVEL ALPHA-RED</div>
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="profile-header">
-                        <div class="profile-icon">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div class="profile-details">
-                            <h3 id="profileName">AGENT</h3>
-                            <p id="profileTeam">TVA Temporal Division</p>
-                        </div>
-                    </div>
-                    <div class="profile-info">
-                        <div class="info-item">
-                            <span class="info-label">CLEARANCE:</span>
-                            <span class="info-value" id="profileClearance">ALPHA-OMEGA</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">TEAM:</span>
-                            <span class="info-value" id="profileTeamName">Time Variance Authority</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">INSTANCE:</span>
-                            <span class="info-value" id="profileInstance">Earth-616</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">LOCATION:</span>
-                            <span class="info-value" id="profileLocation">TVA Headquarters</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">DATE:</span>
-                            <span class="info-value" id="profileDate">31.07.3025</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">TIME:</span>
-                            <span class="info-value" id="profileTime">23:59:47</span>
-                        </div>
-                    </div>
-                    <button class="logout-btn" id="dropdownLogout">
-                        <i class="fas fa-power-off"></i> LOGOUT
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="dossier-content">
-            <div class="dossier-header">INTELLIGENCE REPORT: PURPLRAYN</div>
-            
-            <div class="dossier-section">
-                <div class="dossier-section-title">SUBJECT INFORMATION</div>
-                <div class="dossier-line" style="--delay:1">SUBJECT: Dr. Rhaeyn Cerin</div>
-                <div class="dossier-line" style="--delay:2">CODENAME: <span class="censored">PURPLRAYN</span></div>
-                <div class="dossier-line" style="--delay:3">CLASSIFICATION LEVEL: ALPHA-RED</div>
-                <div class="dossier-line" style="--delay:4">REPORT DATE: 31.07.2025</div>
-            </div>
-            
-            <div class="dossier-section">
-                <div class="dossier-section-title">BACKGROUND</div>
-                <div class="dossier-line" style="--delay:5">Dr. Cerin was a respected scientist in the field of quantum energy</div>
-                <div class="dossier-line" style="--delay:6">until an accident with <span class="censored">PLR radiation</span> (Parallel Light Ray)</div>
-                <div class="dossier-line" style="--delay:7">altered him at the molecular level.</div>
-                <div class="dossier-line" style="--delay:8"></div>
-                <div class="dossier-line" style="--delay:9">He is considered <span class="censored">metaphysically destabilized</span>,</div>
-                <div class="dossier-line" style="--delay:10">possibly no longer fully bound to our reality.</div>
-            </div>
-            
-            <div class="dossier-section">
-                <div class="dossier-section-title">ABILITIES</div>
-                <div class="dossier-line" style="--delay:11">• <span class="censored">Photonic manipulation</span> / Light weapons</div>
-                <div class="dossier-line" style="--delay:12">• Creation of <span class="censored">gravitational distortions</span></div>
-                <div class="dossier-line" style="--delay:13">• Opening of temporary rifts into the <span class="censored">multiverse</span></div>
-                <div class="dossier-line" style="--delay:14">• Emotional influence via <span class="censored">frequency light</span></div>
-            </div>
-            
-            <div class="dossier-section">
-                <div class="dossier-section-title">RECOMMENDATION</div>
-                <div class="dossier-line" style="--delay:15">Subject is to be classified as <span class="censored">hostile</span>.</div>
-                <div class="dossier-line" style="--delay:16">Any interaction only under high-security protocols.</div>
-                <div class="dossier-line" style="--delay:17"></div>
-                <div class="dossier-line" style="--delay:18"><span class="censored">Multiversal backup unit</span> must be on standby.</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- TVA Page -->
-    <div class="page tva-page" id="tvaPage">
-        <div class="navbar">
-            <button class="back-button" id="backFromTva">
-                <i class="fas fa-arrow-left"></i> Back
-            </button>
-            <h2 class="logo">TVA TEMPORAL DOSSIER</h2>
-            <div class="user-info">
-                <div class="security-level">TIME MASTER LEVEL</div>
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="profile-header">
-                        <div class="profile-icon">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div class="profile-details">
-                            <h3 id="profileName">AGENT</h3>
-                            <p id="profileTeam">TVA Temporal Division</p>
-                        </div>
-                    </div>
-                    <div class="profile-info">
-                        <div class="info-item">
-                            <span class="info-label">CLEARANCE:</span>
-                            <span class="info-value" id="profileClearance">ALPHA-OMEGA</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">TEAM:</span>
-                            <span class="info-value" id="profileTeamName">Time Variance Authority</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">INSTANCE:</span>
-                            <span class="info-value" id="profileInstance">Earth-616</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">LOCATION:</span>
-                            <span class="info-value" id="profileLocation">TVA Headquarters</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">DATE:</span>
-                            <span class="info-value" id="profileDate">31.07.3025</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">TIME:</span>
-                            <span class="info-value" id="profileTime">23:59:47</span>
-                        </div>
-                    </div>
-                    <button class="logout-btn" id="dropdownLogout">
-                        <i class="fas fa-power-off"></i> LOGOUT
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="dossier-content">
-            <div class="dossier-header">CONFIDENTIAL DOSSIER: PURPLRAYN</div>
-            
-            <div class="dossier-section">
-                <div class="dossier-section-title">SUBJECT INFORMATION</div>
-                <div class="dossier-line" style="--delay:1">Codename: <span class="censored">PURPLRAYN</span></div>
-                <div class="dossier-line" style="--delay:2">Civilian Name: Dr. Rhaeyn Cerin</div>
-                <div class="dossier-line" style="--delay:3">Status: CLASSIFIED / <span class="censored">EXTREME THREAT</span></div>
-                <div class="dossier-line" style="--delay:4">Case Number: <span class="censored">TVA-PRX-2045-071</span></div>
-                <div class="dossier-line" style="--delay:5">Last Sighting: 31.07.2025</div>
-            </div>
-            
-            <div class="dossier-section">
-                <div class="dossier-section-title">PROFILE OVERVIEW</div>
-                <div class="dossier-line" style="--delay:6">Profession: Astrophysicist, Specialty: <span class="censored">Quantum Cosmic Energy</span></div>
-                <div class="dossier-line" style="--delay:7">Origin: Earth-928 (multiversal parallel cluster)</div>
-                <div class="dossier-line" style="--delay:8">Current Location: <span class="censored">UNKNOWN</span></div>
-                <div class="dossier-line" style="--delay:9"></div>
-                <div class="dossier-line" style="--delay:10">Description:</div>
-                <div class="dossier-line" style="--delay:11">- Semi-transparent body with <span class="censored">prismatic energy veins</span></div>
-                <div class="dossier-line" style="--delay:12">- Wears light-absorbing cloak with <span class="censored">holographic structure</span></div>
-                <div class="dossier-line" style="--delay:13">- Eyes reflect emotional states in <span class="censored">color spectra</span></div>
-            </div>
-            
-            <div class="dossier-section">
-                <div class="dossier-section-title">POWERS / THREAT LEVEL</div>
-                <div class="dossier-line" style="--delay:14">✓ Light manipulation (camouflage, lasers, illusions)</div>
-                <div class="dossier-line" style="--delay:15">✓ <span class="censored">Gravitational distortion</span> and control</div>
-                <div class="dossier-line" style="--delay:16">✓ Creation of unstable mini-portals to the <span class="censored">multiverse</span></div>
-                <div class="dossier-line" style="--delay:17">✓ <span class="censored">Emotional resonance distortion</span> via light spectrum</div>
-                <div class="dossier-line" style="--delay:18"></div>
-                <div class="dossier-line" style="--delay:19">TVA Classification: <span class="censored">DELTA-OMEGA THREAT</span></div>
-                <div class="dossier-line" style="--delay:20">Intervention recommended: ONLY with approved <span class="censored">Time-Strike Team</span></div>
-            </div>
-            
-            <div class="dossier-section">
-                <div class="dossier-section-title">ADDITIONAL INFORMATION</div>
-                <div class="dossier-line" style="--delay:21">The codename <span class="censored">PURPLRAYN</span> was assigned by the TVA after it was determined</div>
-                <div class="dossier-line" style="--delay:22">that Cerin was altered by radiation called <span class="censored">"Parallel Universe Resonance Phased Light Ray - Negative"</span>.</div>
-                <div class="dossier-line" style="--delay:23">His motivations are considered radical:</div>
-                <div class="dossier-line" style="--delay:24"></div>
-                <div class="dossier-line" style="--delay:25">"I do not erase - I repair. Your reality was never intended."</div>
-                <div class="dossier-line" style="--delay:26"></div>
-                <div class="dossier-line" style="--delay:27"><span class="censored">Extreme caution</span> is advised. Any contact is to be avoided.</div>
-            </div>
-        </div>
-    </div>
-    
+
     <script>
-        // MCU-inspired data for profile randomization
-        const TEAMS = [
-            "Avengers Initiative", "S.H.I.E.L.D. Strike Team", "Guardians of the Galaxy", 
-            "X-Men Task Force", "TVA Temporal Division", "Asgardian Recon", 
-            "Wakandan Intelligence", "Sorcerer Supreme Unit"
-        ];
-        
-        const CLEARANCE_LEVELS = [
-            "ALPHA-OMEGA", "GAMMA-DELTA", "OMEGA-RED", "COSMIC CLEARANCE",
-            "TIME MASTER", "REALITY LEVEL 9", "MULTIVERSE ACCESS"
-        ];
-        
-        const LOCATIONS = [
-            "Earth-616", "Asgard", "Titan", "Knowhere", "Sakaar", "Xandar",
-            "Vormir", "Latveria", "Wakanda", "Quantum Realm", "TVA Headquarters"
-        ];
-        
-        const INSTANCES = [
-            "Earth-616", "Earth-199999", "Earth-838", "Earth-1610", "Earth-928",
-            "Earth-2149", "Earth-58163", "Earth-8311", "Earth-928", "Earth-65"
-        ];
-        
-        // Agent profile data
-        let agentProfile = {
-            name: "",
-            team: "",
-            clearance: "",
-            location: "",
-            instance: ""
-        };
-        
-        // Create particles for background
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 30;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                const size = Math.random() * 3 + 1;
-                const posX = Math.random() * 100;
-                const posY = Math.random() * 100;
-                
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${posX}%`;
-                particle.style.top = `${posY}%`;
-                
-                const duration = Math.random() * 25 + 15;
-                particle.style.animationDuration = `${duration}s`;
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-        
-        // Create shield animation
-        function createShieldAnimation() {
-            const shieldAnimation = document.getElementById('shieldAnimation');
-            
-            for (let i = 0; i < 3; i++) {
-                const pulse = document.createElement('div');
-                pulse.classList.add('pulse');
-                shieldAnimation.appendChild(pulse);
-            }
-        }
-        
-        // Create TVA animation elements
-        function createTvaAnimation() {
-            const tvaAnimation = document.getElementById('tvaAnimation');
-            
-            // Create timeline
-            const timeline = document.createElement('div');
-            timeline.classList.add('timeline');
-            tvaAnimation.appendChild(timeline);
-            
-            // Create time nodes
-            for (let i = 0; i < 5; i++) {
-                const timeNode = document.createElement('div');
-                timeNode.classList.add('time-node');
-                
-                const delay = Math.random() * 8;
-                const duration = 8 + Math.random() * 8;
-                
-                timeNode.style.animationDelay = `${delay}s`;
-                timeNode.style.animationDuration = `${duration}s`;
-                
-                tvaAnimation.appendChild(timeNode);
-            }
-        }
-        
-        // Generate random IP address
-        function generateRandomIP() {
-            return Array.from({length: 4}, () => Math.floor(Math.random() * 255)).join('.');
-        }
-        
-        // Generate random coordinates
-        function generateRandomCoordinates() {
-            const lat = (Math.random() * 180 - 90).toFixed(4);
-            const lng = (Math.random() * 360 - 180).toFixed(4);
-            return `${lat}° ${Math.random() > 0.5 ? 'N' : 'S'}, ${lng}° ${Math.random() > 0.5 ? 'E' : 'W'}`;
-        }
-        
-        // Page navigation with smooth transitions
-        function showPage(pageId) {
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => {
-                if (page.classList.contains('active')) {
-                    page.classList.remove('active');
-                }
-            });
-            
-            setTimeout(() => {
-                document.getElementById(pageId).classList.add('active');
-                
-                // Update profile in all pages except login
-                if (pageId !== 'loginPage') {
-                    updateProfileDropdown();
-                }
-                
-                // Animate files on console page
-                if (pageId === 'consolePage') {
-                    setTimeout(animateFiles, 300);
-                }
-                
-                // Animate dossier on dossier pages
-                if (pageId === 'shieldPage' || pageId === 'tvaPage') {
-                    setTimeout(() => animateDossier(pageId.replace('Page', '')), 500);
-                }
-            }, 300);
-        }
-        
-        // Close banner
-        document.getElementById('closeBanner').addEventListener('click', function() {
-            document.getElementById('warningBanner').style.transform = 'translateY(100%)';
-            setTimeout(() => {
-                document.getElementById('warningBanner').style.display = 'none';
-            }, 500);
-        });
-        
-        // System login
-        document.getElementById('systemLoginBtn').addEventListener('click', function() {
-            const username = document.getElementById('systemUsername').value;
-            const password = document.getElementById('systemPassword').value;
-            
-            // Hide any previous error
-            document.getElementById('systemError').style.display = 'none';
-            clearInterval(window.systemCountdown);
-            
-            // Check for empty credentials
-            if (username.trim() === '' || password.trim() === '') {
-                showError("ACCESS DENIED: CREDENTIALS REQUIRED");
-            } 
-            else {
-                // Set profile data
-                agentProfile = {
-                    name: username,
-                    team: TEAMS[Math.floor(Math.random() * TEAMS.length)],
-                    clearance: CLEARANCE_LEVELS[Math.floor(Math.random() * CLEARANCE_LEVELS.length)],
-                    location: LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)],
-                    instance: INSTANCES[Math.floor(Math.random() * INSTANCES.length)]
-                };
-                
-                // Transition to console page
-                setTimeout(() => {
-                    showPage('consolePage');
-                }, 800);
-            }
-        });
-        
-        // Update profile dropdown on all pages
-        function updateProfileDropdown() {
-            document.querySelectorAll('#profileName').forEach(el => {
-                el.textContent = agentProfile.name.toUpperCase();
-            });
-            
-            document.querySelectorAll('#profileTeam').forEach(el => {
-                el.textContent = agentProfile.team;
-            });
-            
-            document.querySelectorAll('#profileTeamName').forEach(el => {
-                el.textContent = agentProfile.team;
-            });
-            
-            document.querySelectorAll('#profileClearance').forEach(el => {
-                el.textContent = agentProfile.clearance;
-            });
-            
-            document.querySelectorAll('#profileLocation').forEach(el => {
-                el.textContent = agentProfile.location;
-            });
-            
-            document.querySelectorAll('#profileInstance').forEach(el => {
-                el.textContent = agentProfile.instance;
-            });
-        }
-        
-        function showError(message) {
-            const errorEl = document.getElementById('systemError');
-            errorEl.innerHTML = message + '<div class="countdown" id="systemCountdown">30</div>SELF-DESTRUCT SEQUENCE INITIATED';
-            errorEl.style.display = 'block';
-            
-            let seconds = 30;
-            document.getElementById('systemCountdown').textContent = seconds;
-            
-            // Show location tracking
-            document.getElementById('coordinates').textContent = generateRandomCoordinates();
-            document.getElementById('ipAddress').textContent = generateRandomIP();
-            document.getElementById('locationOverlay').style.display = 'flex';
-            
-            window.systemCountdown = setInterval(() => {
-                seconds--;
-                document.getElementById('systemCountdown').textContent = seconds;
-                document.getElementById('arrivalTime').textContent = `00:00:${seconds.toString().padStart(2, '0')}`;
-                
-                if (seconds <= 0) {
-                    clearInterval(window.systemCountdown);
-                    document.getElementById('systemError').innerHTML = 
-                        'SYSTEM DESTROYED<br>PLEASE RELOAD THE PAGE';
-                }
-            }, 1000);
-        }
-        
-        // File selection
-        document.getElementById('purplraynFile').addEventListener('click', function() {
-            showPage('mainPage');
-        });
-        
-        // Agency selection
-        document.getElementById('shieldCard').addEventListener('click', function() {
-            showPage('shieldPage');
-        });
-        
-        document.getElementById('tvaCard').addEventListener('click', function() {
-            showPage('tvaPage');
-        });
-        
-        // Back buttons
-        document.getElementById('backFromShield').addEventListener('click', function() {
-            showPage('mainPage');
-        });
-        
-        document.getElementById('backFromTva').addEventListener('click', function() {
-            showPage('mainPage');
-        });
-        
-        // New navigation: Back to console
-        document.getElementById('backToConsole').addEventListener('click', function() {
-            showPage('consolePage');
-        });
-        
-        // Logout buttons
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            // Reset form
-            document.getElementById('systemUsername').value = '';
-            document.getElementById('systemPassword').value = '';
-            showPage('loginPage');
-        });
-        
-        document.getElementById('dropdownLogout').addEventListener('click', function() {
-            // Reset form
-            document.getElementById('systemUsername').value = '';
-            document.getElementById('systemPassword').value = '';
-            showPage('loginPage');
-        });
-        
-        // Profile dropdown toggle
-        document.querySelectorAll('.user-avatar').forEach(avatar => {
-            avatar.addEventListener('click', function() {
-                const dropdown = this.closest('.user-info').querySelector('.profile-dropdown');
-                dropdown.classList.toggle('active');
-            });
-        });
-        
-        function animateFiles() {
-            const files = document.querySelectorAll('#consolePage .file-card');
-            files.forEach((file, index) => {
-                setTimeout(() => {
-                    file.style.animation = 'fadeInUp 0.5s forwards';
-                    file.style.opacity = '1';
-                    file.style.transform = 'translateY(0)';
-                }, index * 500); // 0.5s delay between files
-            });
-        }
-        
-        function animateDossier(type) {
-            const lines = document.querySelectorAll(`#${type}Page .dossier-line`);
-            lines.forEach((line, index) => {
-                setTimeout(() => {
-                    line.style.opacity = '1';
-                }, index * 300);
-            });
-        }
-        
-        // Initialize the application
-        window.addEventListener('load', function() {
-            createParticles();
-            createShieldAnimation();
-            createTvaAnimation();
-            
-            // Hide error message by default
-            document.getElementById('systemError').style.display = 'none';
-            
-            // Set future date (1000 years in the future)
-            const futureDate = new Date();
-            futureDate.setFullYear(futureDate.getFullYear() + 1000);
-            
-            // Format date as DD.MM.YYYY
-            const day = String(futureDate.getDate()).padStart(2, '0');
-            const month = String(futureDate.getMonth() + 1).padStart(2, '0');
-            document.querySelectorAll('#profileDate').forEach(el => {
-                el.textContent = `${day}.${month}.${futureDate.getFullYear()}`;
-            });
-            
-            // Set future time (fast time travel effect)
-            setInterval(() => {
-                const now = new Date();
-                // Make time move faster: 1 real second = 10 minutes
-                now.setMinutes(now.getMinutes() + 10);
-                
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                const seconds = String(now.getSeconds()).padStart(2, '0');
-                
-                document.querySelectorAll('#profileTime').forEach(el => {
-                    el.textContent = `${hours}:${minutes}:${seconds}`;
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let width, height; let stars = []; const numStars = 200;
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+        function initStars() {
+            width = window.innerWidth; height = window.innerHeight;
+            canvas.width = width; canvas.height = height;
+            stars = [];
+            for(let i=0; i<numStars; i++) {
+                stars.push({
+                    x: Math.random() * width - width/2,
+                    y: Math.random() * height - height/2,
+                    z: Math.random() * width,
+                    size: Math.random() * 2 
                 });
-            }, 1000);
+            }
+        }
+        function animateStars() {
+            ctx.clearRect(0,0,width,height);
             
+            const parallaxX = (mouseX - width/2) * 0.2; 
+            const parallaxY = (mouseY - height/2) * 0.2;
+
+            for(let i=0; i<numStars; i++) {
+                let s = stars[i];
+                s.z -= 0.5; 
+                if(s.z <= 0) { s.z = width; s.x = Math.random() * width - width/2; s.y = Math.random() * height - height/2; }
+                
+                let k = 128.0 / s.z;
+                let px = (s.x * k + width/2) - (parallaxX * k * 0.1); 
+                let py = (s.y * k + height/2) - (parallaxY * k * 0.1);
+                
+                let size = (1 - s.z / width) * 4 + s.size;
+                
+                if(px >= -50 && px <= width+50 && py >= -50 && py <= height+50) {
+                    ctx.beginPath(); ctx.arc(px, py, size, 0, Math.PI*2);
+                    
+                    ctx.shadowBlur = size * 5; 
+                    ctx.shadowColor = "rgba(181, 1, 230, 0.4)"; 
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.3)"; 
+                    
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+            requestAnimationFrame(animateStars);
+        }
+        window.addEventListener('resize', initStars); initStars(); animateStars();
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSoftClick() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(200, now);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(400, now);
+
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.2, now + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+            osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 0.1);
+        }
+        document.addEventListener('mousedown', playSoftClick);
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('clock-time').innerText = timeString + " DE";
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function updateViews() {
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000; 
+
+            let views = localStorage.getItem('fakeViews');
+            let lastUpdate = localStorage.getItem('viewLastUpdate');
+
+            if (!views) {
+                views = Math.floor(Math.random() * (20000 - 5000 + 1) + 5000);
+                localStorage.setItem('fakeViews', views);
+                localStorage.setItem('viewLastUpdate', now);
+            } else {
+                views = parseInt(views);
+                if (!lastUpdate) lastUpdate = 0; 
+                lastUpdate = parseInt(lastUpdate);
+
+                if (now - lastUpdate > oneDay) {
+                    const daysPassed = Math.floor((now - lastUpdate) / oneDay);
+                    
+                    for (let i = 0; i < daysPassed; i++) {
+                        views += Math.floor(Math.random() * 999) + 1;
+                    }
+
+                    localStorage.setItem('fakeViews', views);
+                    localStorage.setItem('viewLastUpdate', now);
+                }
+            }
+            document.getElementById('view-count').innerText = views.toLocaleString();
+        }
+        updateViews();
+
+        const discordID = "448191423078989825";
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const statusColors = { online: "#23a559", idle: "#f0b232", dnd: "#f23f43", offline: "#747f8d" };
+        const statusNames = { online: "Online", idle: "Abwesend", dnd: "Nicht stören", offline: "Offline" };
+
+        async function fetchDiscordStatus() {
+            try {
+                const response = await fetch(`https://api.lanyard.rest/v1/users/${discordID}`);
+                const data = await response.json();
+                if (data.success) {
+                    const { discord_status, activities } = data.data;
+                    updateStatusDisplay(discord_status, activities);
+                }
+            } catch (error) { statusText.innerText = "Offline"; }
+        }
+
+        function updateStatusDisplay(status, activities) {
+            const color = statusColors[status] || statusColors.offline;
+            statusDot.style.color = color;
+            statusDot.style.textShadow = `0 0 10px ${color}`;
+            const game = activities.find(act => act.type === 0);
+            if (game) { statusText.innerText = `Playing: ${game.name}`; } 
+            else { statusText.innerText = statusNames[status] || "Offline"; }
+        }
+        fetchDiscordStatus(); setInterval(fetchDiscordStatus, 30000);
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+                setTimeout(() => { document.body.classList.add('entered'); }, 300);
+            }, 2000); 
+        });
+
+        const targetTitle = "@purplrayn"; let currentTitleIndex = 0;
+        function animateTitle() {
+            if (currentTitleIndex <= targetTitle.length) { document.title = targetTitle.substring(0, currentTitleIndex); currentTitleIndex++; setTimeout(animateTitle, 400); } 
+            else { setTimeout(() => { currentTitleIndex = 1; animateTitle(); }, 4000); }
+        }
+        animateTitle();
+
+        function handleIconClick(event, type, copyText) {
+            const btn = event.currentTarget;
+            
+            btn.classList.add('active-click');
+            setTimeout(() => btn.classList.remove('active-click'), 200);
+
+            const rect = btn.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            let impulse = document.createElement('div');
+            impulse.className = 'icon-impulse';
+            impulse.style.left = x + 'px'; impulse.style.top = y + 'px';
+            document.body.appendChild(impulse);
+            setTimeout(() => { impulse.remove(); }, 600);
+
+            if(type === 'copy' && copyText) {
+                copyToClipboard(copyText);
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const nameEl = document.getElementById('username-display');
+                const originalText = "@purplrayn";
+                nameEl.innerText = "Copied!";
+                nameEl.classList.add('copied-state');
+                setTimeout(() => {
+                    nameEl.innerText = originalText;
+                    nameEl.classList.remove('copied-state');
+                }, 1500);
+            });
+        }
+
+        let isThrottled = false;
+        document.addEventListener('mousemove', function(e) {
+            if (isThrottled) return; isThrottled = true; setTimeout(() => isThrottled = false, 30);
+            let particle = document.createElement('div');
+            particle.className = 'cursor-particle';
+            particle.style.left = (e.pageX - 3) + 'px'; particle.style.top = (e.pageY - 3) + 'px';
+            document.body.appendChild(particle);
+            setTimeout(() => { particle.remove(); }, 800);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.social-link') || e.target.closest('.card-container a')) return; 
+            let warp = document.createElement('div');
+            warp.className = 'click-warp';
+            warp.style.left = e.pageX + 'px'; warp.style.top = e.pageY + 'px';
+            document.body.appendChild(warp);
+            setTimeout(() => { warp.remove(); }, 500);
         });
     </script>
 </body>
